@@ -1,0 +1,249 @@
+.sort {
+    position: relative;
+
+    .next-order {
+        margin-left: 200px;
+    }
+
+    .order-detail {
+        padding: 10px;
+
+        .details {
+            line-height: 40px;
+
+            padding: 10px;
+        }
+
+        .user {
+            font-weight: 600;
+
+            margin-top: 20px;
+
+            color: #777;
+
+            .info {
+                display: flex;
+
+                justify-content: space-between;
+            }
+
+            .addr {
+                margin-top: 20px;
+            }
+        }
+    }
+
+    .clothes {
+        padding: 20px;
+
+        .clothes-detail {
+            display: flex;
+
+            margin-bottom: 20px;
+
+            align-items: center;
+
+            .number {
+                font-size: 16px;
+                font-weight: 600;
+
+                margin-right: 20px;
+
+                color: #444;
+            }
+
+            // .tip {
+            //     display: flex;
+
+            //     color: #2d8cf0;
+
+            //     align-items: center;
+
+            //     .tip-content {
+            //         margin-left: 10px;
+            //     }
+            // }
+        }
+    }
+
+    .handle {
+        margin-top: 30px;
+        margin-bottom: 20px;
+
+        text-align: center;
+    }
+}
+
+.scan_modal {
+    .ivu-modal {
+        top: 50%;
+
+        transform: translate(10%, -50%);
+    }
+
+    .scan {
+        padding: 50px;
+        div {
+            font-size: 18px;
+
+            text-align: center;
+        }
+
+        .start-scan {
+            font-size: 32px;
+
+            display: flex;
+
+            margin: 50px 0;
+
+            align-items: center;
+            justify-content: center;
+
+            .ivu-icon-ios-search-strong {
+                margin-left: 20px;
+            }
+        }
+
+        .desc {
+            text-align: left;
+
+            color: 14px;
+            color: red;
+        }
+    }
+}
+
+.add_modal {
+    .brand-name {
+        width: 300px;
+        height: 30px;
+        padding-left: 10px;
+
+        border: 1px solid #dddee1;
+    }
+    .camera-list {
+        display: flex;
+
+        flex-wrap: wrap;
+
+        .camera-wrap {
+            position: relative;
+
+            display: flex;
+
+            width: 100px;
+            height: 100px;
+            margin-right: 20px;
+
+            border: 1px solid #dddee1;
+
+            align-items: center;
+            justify-content: center;
+
+            img {
+                width: 100px;
+                height: 100px;
+            }
+
+            .close-btn {
+                position: absolute;
+                z-index: 899;
+                top: -10px;
+                right: -10px;
+
+                display: block;
+            }
+        }
+    }
+
+    .brand-list {
+        position: absolute;
+        z-index: 1011;
+
+        display: flex;
+        overflow-y: scroll;
+
+        width: 90%;
+        max-height: 300px;
+        padding: 10px 20px;
+
+        border: 1px solid #dddee1;
+        background-color: #fff;
+
+        flex-wrap: wrap;
+
+        .ivu-input-wrapper {
+            margin: 10px 0 30px;
+        }
+
+        .each-brand {
+            height: auto;
+
+            cursor: pointer;
+
+            .img-wrap {
+                display: flex;
+
+                width: 60px;
+                height: 60px;
+                margin-right: 10px;
+
+                border: 1px solid #333;
+
+                justify-content: center;
+                align-items: center;
+
+                img {
+                    width: 60px;
+                    height: 60px;
+                }
+            }
+
+
+            .img-name {
+                width: 60px;
+                margin-top: 6px;
+
+                text-align: center;
+            }
+        }
+
+        .active {
+            .img-name {
+                color: #ed3f14;
+            }
+        }
+
+        .each-brand:hover {
+            .img-wrap {
+                width: 70px;
+                height: 70px;
+
+                border: 1px solid #f90;
+
+                img {
+                    width: 70px;
+                    height: 70px;
+                }
+            }
+
+            .img-name {
+                font-size: 14px;
+
+                color: #f90;
+            }
+        }
+    }
+}
+
+.big_modal {
+    .ivu-modal-wrap {
+        z-index: 1001;
+    }
+
+    .big-back-pic {
+        img {
+            width: 100%;
+        }
+    }
+}
