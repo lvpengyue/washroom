@@ -15,6 +15,7 @@ const state = {
     next: '', // 确认进行下一单
     barCode: '', // 当前的码号
     money: '', // 收银结果
+    entryCode: '' // 录入水洗码
 };
 
 const SORT_SET_DATA = 'SORT_SET_DATA';
@@ -23,6 +24,7 @@ const SORT_SET_DELETE = 'SORT_SET_DELETE';
 const SORT_SET_NEXT = 'SORT_SET_NEXT';
 const SORT_SET_BAR_CODE = 'SORT_SET_BAR_CODE';
 const SORT_SET_MONEY = 'SORT_SET_MONEY';
+const SORT_SET_ENTRY_CODE = 'SORT_SET_ENTRY_CODE';
 
 const mutations = {
 
@@ -78,6 +80,15 @@ const mutations = {
      */
     [SORT_SET_MONEY](state, mutation) {
         state.money = mutation.payload;
+    },
+
+    /**
+     * 设置录入水洗码结果
+     * @param {Object} state state
+     * @param {FSA} mutation mutation
+     */
+    [SORT_SET_ENTRY_CODE](state, mutation) {
+        state.entryCode = mutation.payload;
     }
 };
 
@@ -222,6 +233,31 @@ const actions = {
             console.log(`收银失败:${error.code}`);
         }
     },
+
+    /**
+     * 录入水洗码
+     * @param {Object} context context
+     * @param {Object} params contact content type
+     */
+    async sortGetEntryCode({
+        commit,
+        dispatch,
+        state
+    }, params) {
+        try {
+            const response = await dispatch('$apisCall', {
+                config: $apiConf.API_SORT_ORDER_ENTRY_CODE,
+                params
+            });
+
+            commit({
+                type: SORT_SET_ENTRY_CODE,
+                payload: response
+            });
+        } catch (error) {
+            console.log(`录入水洗码失败:${error.code}`);
+        }
+    },
 };
 
 const getters = {
@@ -279,6 +315,15 @@ const getters = {
     sortMoney(state) {
         return state.money;
     },
+
+    /**
+     * 获取录入水洗码结果
+     * @param {Object} state state
+     * @return {Object} price 收银
+     */
+    sortEntryCode(state) {
+        return state.entryCode;
+    }
 };
 
 export default {

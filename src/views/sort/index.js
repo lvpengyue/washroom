@@ -19,55 +19,55 @@ export default {
 
         this.scanModal = true;
         
-        const that = this;
-        window.onload = function (e) {
-            let code = '';
-            let lastTime, nextTime;
-            let lastCode, nextCode;
+        // const that = this;
+        // window.onload = function (e) {
+        //     let code = '';
+        //     let lastTime, nextTime;
+        //     let lastCode, nextCode;
 
-            document.onkeypress = function (e) {
-                if (window.event) {
-                    // IE
-                    nextCode = e.keyCode;
-                } else if (e.which) {
-                    // Netscape/Firefox/Opera
-                    nextCode = e.which;
-                }
+        //     document.onkeypress = function (e) {
+        //         if (window.event) {
+        //             // IE
+        //             nextCode = e.keyCode;
+        //         } else if (e.which) {
+        //             // Netscape/Firefox/Opera
+        //             nextCode = e.which;
+        //         }
 
-                nextTime = new Date().getTime();
+        //         nextTime = new Date().getTime();
 
-                if (lastCode !== null && lastTime !== null && nextTime - lastTime <= 30) {
-                    code += String.fromCharCode(lastCode);
-                } else if (lastCode !== null && lastTime !== null && nextTime - lastTime > 100) {
-                    code = '';
-                }
+        //         if (lastCode !== null && lastTime !== null && nextTime - lastTime <= 30) {
+        //             code += String.fromCharCode(lastCode);
+        //         } else if (lastCode !== null && lastTime !== null && nextTime - lastTime > 100) {
+        //             code = '';
+        //         }
 
-                lastCode = nextCode;
-                lastTime = nextTime;
-            };
+        //         lastCode = nextCode;
+        //         lastTime = nextTime;
+        //     };
 
-            this.onkeypress = async function (e) {
-                // alert(333);
-                if (e.which == 13) {
-                    if (code != '') {
-                        that.scanModal = true;
-                        that.barCode = code;
-                        // await that.sortGetData({
-                        //     barCode: code
-                        // })
-                        // if (that.sortData && that.sortData.code != 1) {
-                        //     that.$Message.error({
-                        //         content: that.sortData.info,
-                        //         duration: 2
-                        //     })
-                        // }
+        //     this.onkeypress = async function (e) {
+        //         // alert(333);
+        //         if (e.which == 13) {
+        //             if (code != '') {
+        //                 that.scanModal = true;
+        //                 that.barCode = code;
+        //                 // await that.sortGetData({
+        //                 //     barCode: code
+        //                 // })
+        //                 // if (that.sortData && that.sortData.code != 1) {
+        //                 //     that.$Message.error({
+        //                 //         content: that.sortData.info,
+        //                 //         duration: 2
+        //                 //     })
+        //                 // }
 
-                        // that.scanModal = false;
-                    }
-                    code = '';
-                }
-            };
-        };
+        //                 // that.scanModal = false;
+        //             }
+        //             code = '';
+        //         }
+        //     };
+        // };
 
         await this.mainGetBaseData();
     },
@@ -126,7 +126,7 @@ export default {
         const showComplete= Util.showThisRoute(JSON.parse(Cookies.get('permission')), 'sort_index_complete');
         // 删除衣物
         const showDel = Util.showThisRoute(JSON.parse(Cookies.get('permission')), 'sort_index_del');
-        // 重新打码
+        // 录入水洗码
         const showPrint= Util.showThisRoute(JSON.parse(Cookies.get('permission')), 'sort_index_print_code') ? 'inline-block' : 'none';
         // 收银
         const showMoney = Util.showThisRoute(JSON.parse(Cookies.get('permission')), 'sort_index_money');
@@ -178,7 +178,18 @@ export default {
                 checkResult: 0, // 0 不合格 1 合格
                 remarks: '', // 备注
                 pic: '',
+                washNo: ''
             },
+            regetBarModal: false, // 录入水洗码弹框
+            regetData: { // 录入水洗码接口的参数
+                clothesId: '',
+                factoryOrderId: '',
+                washNo: ''
+            },
+            regetBar: '', // 绑定的水洗码
+            totalPrice: 0, // 收银总价
+            clothMoneyList: '', // 收银衣物列表
+
 
             // 订单衣物列表
             clothesColumns: [
@@ -264,10 +275,10 @@ export default {
                           },
                           on: {
                             click: () => {
-                              this.rePrint(params.row);
+                              this.reGetBarcode(params.row);
                             }
                           }
-                        }, '重新打码')
+                        }, '录入水洗码')
                       ]); 
                     }
                 }  
@@ -342,9 +353,12 @@ export default {
             'sortNext',
             'sortBarcode',
             'sortMoney',
+            'sortEntryCode',
             'mainUpload',
             'mainBaseData',
-            'mainBarCode'
+            'mainBarCode',
+            'orderIndexDetail',
+            'loginData'
         ])
     },
 
@@ -356,9 +370,11 @@ export default {
             'sortGetNext',
             'sortSetBarcode',
             'sortGetMoney',
+            'sortGetEntryCode',
             'mainGetUpload',
             'mainGetBaseData',
-            'mainGetBarCode'
+            'mainGetBarCode',
+            'orderIndexGetDetail'
         ]),
 
         getPrice() {
@@ -394,6 +410,34 @@ export default {
                         this.$Notice.success({
                             title: this.sortMoney.info
                         });
+
+                        // 收银成功后，要打印收银小票
+                        // 获取订单衣物详情
+                        await this.orderIndexGetDetail({
+                            factoryOrderId: this.sortData.data.order.id
+                        });
+
+                        if (this.orderIndexDetail && this.orderIndexDetail.code == 1) {
+                            this.clothMoneyList = this.orderIndexDetail.data;
+                        } else {
+                            return false;
+                        }
+
+                        this.totalPrice = 0;
+                        // 计算出总价，复制给一个变量
+                        let total = 0;
+                        this.orderIndexDetail.data.forEach(item => {
+                            total += item.processPrice * 100;
+                        });
+
+                        this.totalPrice = (total / 100).toFixed(2);
+
+                        setTimeout(() => {
+                            printJS({
+                                printable: 'print',
+                                type: 'html'
+                            });
+                        }, 700);
                     }
                 },
                 onCancel: () => {}
@@ -401,7 +445,7 @@ export default {
         },
 
         /**
-         * 重新打印条码
+         * 重新打印条码 --- 弃用
          *
          * @param {Object} row 要打印的衣服对象
          */
@@ -428,6 +472,48 @@ export default {
             }, 200);
         },
 
+        /**
+         * 重新录入水洗码
+         *
+         * @param {*} row
+         */
+        reGetBarcode(row) {
+            this.regetData.clothesId = row.id;
+            this.regetData.factoryOrderId = row.factoryOrderId;
+            this.regetBar = '';
+            this.regetData.washNo = '';
+            this.regetBarModal = true;
+            this.regetBar = '';
+        },
+
+        /**
+         * 提交录入的水洗码
+         *
+         */
+        async saveRegetBar() {
+            if (!this.regetBar) {
+                return false;
+            }
+
+            this.regetData.washNo = this.regetBar;
+
+            this.modal_loading = true;
+            await this.sortGetEntryCode(this.regetData);
+            this.modal_loading = false;
+            if (this.sortEntryCode && this.sortEntryCode.code == 1) {
+                // 录入成功，收起弹框，刷新数据
+                this.$Message.success('录入水洗码成功');
+                this.regetBarModal = false;
+                await this.sortGetData({
+                    barCode: this.sortBarcode
+                })
+            } else {
+                this.$Notice.warning({
+                    title: this.sortEntryCode.info
+                })
+            }
+        },
+ 
         // 弹出扫码框
         showScan() {
             this.scanModal = true;
@@ -516,6 +602,7 @@ export default {
                 checkResult: 0, // 0 不合格 1 合格
                 remarks: '', // 备注
                 pic: '',
+                washNo: ''
             },
             this.selectBrand = '';
             this.selectCategory = '';
@@ -694,6 +781,14 @@ export default {
                 return false;
             }
 
+            if (!this.addClothesData.washNo) {
+                this.$Notice.warning({
+                    title: '水洗单号不得为空'
+                });
+
+                return false;
+            }
+
             // 此处暂时不需要判断必须上传照片，故注释
             // if (this.picList.length < 1) {
             //     this.$Notice.warning({
@@ -712,7 +807,6 @@ export default {
             this.addClothesData.checkResult = checkResult;
             this.modal_loading = true;
             await this.sortGetEdit(this.addClothesData);
-            this.addModal = false;
 
             if (this.sortEdit && this.sortEdit.code == 0) {
                 this.$Notice.warning({
@@ -720,6 +814,7 @@ export default {
                 });
                 this.modal_loading = false;
             } else {
+                this.addModal = false;
                 this.modal_loading = false;
                 this.editCategory = false;
                 // 将返回结果赋值给printCloth
@@ -732,23 +827,23 @@ export default {
                 // 生成二维码
                 // this.useqrcode(this.sortEdit.data.washNo);
 
-                await this.mainGetBarCode({
-                    codeStr: this.printCloth.washNo
-                });
+                // await this.mainGetBarCode({
+                //     codeStr: this.printCloth.washNo
+                // });
     
-                if (this.mainBarCode && this.mainBarCode.code != 1) {
-                    this.$Notice.warning({
-                        title: this.mainBarCode.info
-                    })
+                // if (this.mainBarCode && this.mainBarCode.code != 1) {
+                //     this.$Notice.warning({
+                //         title: this.mainBarCode.info
+                //     })
     
-                    return false;
-                }
-                setTimeout(() => {
-                    printJS({
-                        printable: 'print',
-                        type: 'html'
-                    });
-                }, 700);
+                //     return false;
+                // }
+                // setTimeout(() => {
+                //     printJS({
+                //         printable: 'print',
+                //         type: 'html'
+                //     });
+                // }, 700);
             }
         },
 

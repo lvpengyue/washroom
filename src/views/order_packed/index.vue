@@ -9,6 +9,15 @@
 
 
 
+
+
+
+
+
+
+
+
+
 </style>
 <template>
     <div class="order-packed-list" v-if="orderPackedData && orderPackedData.data">
@@ -63,36 +72,49 @@
             </Col>
         </Row>
         <!--打印内容-->
-        <div id="printPacked" style="width: 100%;">
-            <div style="display: flex; align-items:center; font-size: 10px;" v-if="packOrder">
-                <div style="border-right: 1px #000 solid; width: 300px;">
-                    <div style="border-bottom: 1px #000 solid;">
-                        <img src="./assets/logo.png" alt="" style="height: 12px;">
-                        <div style="margin: 8px 0;">订单件数：{{packOrder.clothNum}}（件）</div>
+        <div id="printPacked" style="width: 280px;">
+            <div style="font-size: 10px; width: 100%;" v-if="packOrder && packOrderDetail">
+                <div style="width: 100%;">
+                    <div style="padding: 30px 0;">
+                        <img src="./assets/logo.png" alt="" style="height: 36px; margin-left: 70px;">
                     </div>
-                    <div style="display: flex; margin-top: 6px;">
-                        <img src="./assets/address.png" alt="" style="display: block; height: 12px; margin-right: 5px;">
-                        <div style="line-height: 16px;">
-                            <p style="margin: 4px 0;">
-                                {{packOrder.receiveUserName}}  {{packOrder.receiveUserPhone}}
-                            </p>
-                            <br>
-                            <p>
-                                {{packOrder.receiveUserAddress}}
-                            </p>
+                    <div style="padding: 20px 0; border-bottom: 1px #000 dashed;">
+                        驿站名称：{{packOrder.postName}}
+                    </div>
+                    <div style="width: 100%; padding: 15px 0; border-bottom: 1px #000 dashed; line-height: 36px;">
+                        <div style="display: flex;line-height: 36px; width: 100%; ">
+                            <p style="width: 100px; text-align: justify;">收货人：</p>
+                            <p style="width: 150px;">{{packOrder.receiveUserName}}</p>
+                        </div>
+                        <div style="display: flex;line-height: 36px; width: 100%; ">
+                            <p style="width: 100px; text-align: justify;">电话：</p>
+                            <p style="width: 150px;">{{packOrder.receiveUserPhone}}</p>
+                        </div>
+                        <div style="display: flex;line-height: 36px; width: 100%; ">
+                            <p style="width: 100px; text-align: justify;">收货地址：</p>
+                            <p style="width: 150px;">{{packOrder.receiveUserAddress}}</p>
                         </div>
                     </div>
-                </div>
-
-                <div style="padding: 10px 6px 12px 6px; text-align: center; width: 200px;">
-                    <div style="width: 100%; text-align: center; margin: 10px;">
-                         <img :src="mainBarCode ? mainBarCode.data.url : ''" alt="" style="width: 40px; height: 40px;">
+                    <div style="display: flex; padding: 15px 0; border-bottom: 1px dashed #000;">
+                        <p style="width: 180px;">衣物品类名称</p>
+                        <p style="width: 100px;">数量</p>
                     </div>
-                   
-                    <p style="text-align:left; width: 100%; line-height: 28px;">物流编号：</p>
-                    <p style="text-align:left; width: 100%; line-height: 28px; word-wrap: break;">{{packOrder.orderNum}}</p>
+                    <div style="display: flex; height: 46px; padding-top: 6px;" v-for="item in packOrderDetail">
+                        <p style="width: 180px;">{{item.categoryName}}</p>
+                        <p style="width: 100px;">1</p>
+                    </div>
+                    <div style="width: 100%; border-bottom: 1px #000 dashed; border-top: 1px dashed #000; padding: 15px 0; display: flex; justify-content: space-between;">
+                        <p style="width: 180px;">订单件数：</p>
+                        <p style="width: 100px;">{{packOrder.clothNum}}（件）</p>
+                    </div>
+                    <div style="padding: 30px 0; display: flex; width: 100%; line-height: 36px;">
+                        <p style="width: 80px;">物流编号：</p>
+                        <p style="width: 180px; word-wrap: break-all; line-height: 36px;">{{packOrder.orderNum}}</p>
+                    </div>
+                    <div style="width: 100%;">
+                        <img :src="mainBarCode ? mainBarCode.data.url : ''" alt="" style="width: 90px; height: 90px; margin-left: 70px;">
+                    </div>
                 </div>
-                
             </div>
         </div>
         <Modal v-model="clothesModal"

@@ -64,6 +64,7 @@ export default {
         userPhone: ''
       },
       packOrder: '', // 要打包的订单数据
+      packOrderDetail: '', // 要打包的衣物列表
       columns: [
         {
           title: '订单编号',
@@ -382,6 +383,7 @@ export default {
     // 展示衣物列表
     async showClothes(row) {
       this.orderId = row.id;
+      this.packOrderDetail = '';
       this.packOrder = row;
       this.$Spin.show();
       await this.orderIndexGetDetail({
@@ -389,6 +391,7 @@ export default {
       });
       if (this.orderIndexDetail && this.orderIndexDetail.code == 1) {
         this.clothesModal = true;
+        this.packOrderDetail = this.orderIndexDetail.data;
       } else {
         this.$Message.error({
           content: this.orderIndexDetail.info,

@@ -103,32 +103,31 @@
                 </Card>
             </Col>
             
-
+            <!--打印的数据-->
             <Col span="24">
-                <div class="printBox" ref="print" id="print">
-                    <div class="print-wrap"  v-if="sortData && printCloth" style="width: 100%; padding: 0; display: flex; justify-content: space-between; align-items: top; font-size: 12px; padding-top: 20px;">
-                        <div class="print-left" style="display: flex; justify-content: space-between; align-items: top;">
-                            <div id="query" style="width: 46px; height: 46px;">
-                                <img :src="(mainBarCode && mainBarCode.data) ? mainBarCode.data.url : ''" style="width: 46px; height: 46px; margin-right: 6px;" alt="">
-                            </div>
-                            <div class="pritn-left-right" style="height: 84px; width: 84px; word-wrap: break-word; overflow: hidden;">
-                                <!-- <img src="./assets/logo.png" alt="" style="height: 20px;"> -->
-                                <img src="http://img.test.xmulife.com/images/laundry-delivery-log.png" alt="" style="height: 20px;">
-                                <p style="font-size: 12px; margin: 0; padding: 0; line-height: 13px; word-wrap: break-word">*{{printCloth.washNo}}*</p>
-                            </div>
-                        </div>
-
-                        <div class="print-right" style="height: 80px; line-height: 13px;">
-                            <p style="margin: 0; padding: 0; word-wrap: break-word">{{sortData.data.order.orderNum}}</p>
-                            <p style="font-size: 12px; margin: 0; padding: 0; word-wrap: break-word">{{printCloth.categoryName}}({{printCloth.brandName}})</p>
-                            <p style="font-size: 12px; margin: 0; padding: 0; word-wrap: break-word">{{printCloth.remarks}}</p>
-                        </div>
+                <div class="printBox" ref="print" id="print" style="width: 280px; font-size: 10px;" v-if="clothMoneyList && sortData">
+                    <div style="margin: 10px 0;">加工商名称：{{loginData.data.laundry.name}}</div>
+                    <div style="padding: 10px 0;">收银日期：{{new Date().toLocaleString()}}</div>
+                    <div style="font-size: 12px; padding:20px 0; border-top: 1px dashed #000; border-bottom: 1px dashed #000;">
+                        <p>订单号：</p>
+                        <p>{{sortData.data.order.orderNum}}</p>
                     </div>
-                    
+                    <div style="display: flex; padding: 15px 0; border-bottom: 1px dashed #000;">
+                        <p style="width: 140px;">衣物品类名称</p>
+                        <p style="width: 60px;">数量</p>
+                        <p style="width: 80px;">价格</p>
+                    </div>
+                    <div style="display: flex; height: 46px; margin: 10px 0;" v-for="item in clothMoneyList">
+                        <p style="width: 140px; overflow: hidden;">{{item.categoryName}}</p>
+                        <p style="width: 60px;">1</p>
+                        <p style="width: 80px;">{{item.processPrice === null ? '无' : item.processPrice.toFixed(2)}}</p>
+                    </div>
+                    <div style="display: flex; padding: 10px 0; border-top: 1px dashed #000;">
+                        <p style="width: 200px">总价：</p>
+                        <p style="width: 80px">{{totalPrice}}</p>
+                    </div>
                 </div>
             </Col>
-            
-
         </Row>
         <Modal v-model="scanModal"
                class="scan_modal"
@@ -236,6 +235,10 @@
                         </div>
                     </div>
 
+                    <FormItem label="水洗单号：" prop="">
+                        <Input placeholder="请用扫码枪扫描单号，或手动输入" v-model="addClothesData.washNo"></Input>
+                    </FormItem>
+
                     <FormItem label="瑕疵(合格可洗类衣物请勾选)：" prop="">
                          <CheckboxGroup v-if="mainBaseData && mainBaseData.data" v-model="remarks">
                              <Checkbox :label="item.name" v-for="item in mainBaseData.data.remarksList" :key="item.id"></Checkbox>
@@ -306,6 +309,43 @@
             </p>
             <div class="big-back-pic">
                 <img :src="bigUrl" alt="">
+            </div>
+        </Modal>
+        <Modal v-model="regetBarModal"
+               class="reget_bar_modal"
+               :mask-closable="false"
+               :closable="true"
+               :transfer="false"
+               width="600">
+            <p slot="header"
+               style="color:#f60; font-size: 18px; text-align:center;">
+                <Icon type="information-circled"></Icon>
+                <span>录入水洗码</span>
+            </p>
+            <div class="scan">
+                <div>
+                    扫描结果：
+                    <Input type="text"
+                           style="width: 300px;"
+                           autofocus
+                           v-model="regetBar"></Input>
+                </div>
+                <div class="start-scan">
+                    开始扫描条形码
+                    <Icon type="ios-search-strong"
+                          :size="50"></Icon>
+                </div>
+                <div class="desc">
+                    <p>提示：</p>
+                    <p>1.如果读取失败，请尝试鼠标点击输入框，获取光标后开始扫码，才可读取条形码/二维码</p>
+                    <p>2.请使用扫码枪扫描水洗条码上的条码/二维码</p>
+                </div>
+            </div>
+            <div slot="footer">
+                <Button type="success"
+                        size="large"
+                        :loading="modal_loading"
+                        @click="saveRegetBar()">提交</Button>
             </div>
         </Modal>
     </div>

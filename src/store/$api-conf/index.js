@@ -596,6 +596,22 @@ export default {
     },
 
     /*
+        录入水洗码
+    */
+    API_SORT_ORDER_ENTRY_CODE: {
+        name: 'API_SORT_ORDER_ENTRY_CODE',
+
+        proxy: {
+            url: `${baseUrl}/api/sort/order/entry-code`,
+            method: 'POST',
+            dataType: 'json',
+            xhrFields: {
+                withCredentials: true
+            }
+        }
+    },
+
+    /*
         删除衣物
     */
     API_SORT_ORDER_DELETE_CLOTHES: {

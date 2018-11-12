@@ -61,6 +61,7 @@ export default {
         userId: ''
       },
       packOrder: '', // 要打包的订单数据
+      packOrderDetail: '', // 打包订单衣物列表
       columns: [
         {
           title: '订单编号',
@@ -341,6 +342,22 @@ export default {
      */
     async rePrint(row) {
       this.packOrder= row;
+      this.packOrderDetail = '';
+      
+      await this.orderIndexGetDetail({
+        factoryOrderId: row.id
+      });
+      if (this.orderIndexDetail && this.orderIndexDetail.code == 1) {
+        this.packOrderDetail = this.orderIndexDetail.data;
+      } else {
+        this.$Message.error({
+          content: this.orderIndexDetail.info,
+          duration: 1.5
+        })
+
+        return false;
+      }
+
       // 开始生成二维码，并打印条码
       await this.mainGetBarCode({
         codeStr: this.packOrder.orderNum
